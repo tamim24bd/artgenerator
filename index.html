@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Doodle Art</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #f8f8f8; /* Faded white background */
+    }
+
+    canvas {
+      display: block;
+      background-color: #dfe6e9; /* Faded blue-gray canvas background */
+      flex: 1;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px;
+	  position: absolute;
+    }
+
+    button {
+      margin-right: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="button-container">
+    <button id="changeDesign" onclick="updateCanvas()">Change Design</button>
+    <button id="downloadArt" onclick="downloadArt()">Download Art</button>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    const canvasBackgroundColor = '#dfe6e9'; // Faded blue-gray canvas background
+    const upscaleFactor = 2; // Increase the pixel density
+
+    function getRandomFadedColor() {
+      const randomBrightness = Math.floor(Math.random() * 30) + 70;
+      const randomSaturation = Math.floor(Math.random() * 30) + 70;
+      return `hsla(360, ${randomSaturation}%, ${randomBrightness}%, 0.8)`;
+    }
+
+    function getRandomPalette() {
+      const palettes = [
+        ['#FF8371', '#FC7C5E', '#F8AF80', '#F2B0A9', '#ECF8E3'],
+        ['#64B3F4', '#378AD3', '#2364AA', '#15396B', '#0D1C36'],
+        ['#F06D77', '#E8A87C', '#E1EAB4', '#78C0E0', '#566C86'],
+        ['#D8E2DC', '#FFE5D9', '#FFCAD4', '#F4ACB7', '#9D8189'],
+      ];
+      return palettes[Math.floor(Math.random() * palettes.length)];
+    }
+
+    function createRandomDoodle(ctx, canvas, palette) {
+      ctx.globalAlpha = 0.8;
+
+      // Draw random lines
+      for (let i = 0; i < 30; i++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.strokeStyle = palette[Math.floor(Math.random() * palette.length)];
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Draw random curves
+      for (let i = 0; i < 10; i++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.quadraticCurveTo(
+          Math.random() * canvas.width, Math.random() * canvas.height,
+          Math.random() * canvas.width, Math.random() * canvas.height
+        );
+        ctx.strokeStyle = palette[Math.floor(Math.random() * palette.length)];
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Draw random circles
+      for (let i = 0; i < 15; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 20, 0, Math.PI * 2);
+        ctx.fillStyle = palette[Math.floor(Math.random() * palette.length)];
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      ctx.globalAlpha = 1.0;
+    }
+
+    function initializeCanvas() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const pixelRatio = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * pixelRatio * upscaleFactor;
+      canvas.height = window.innerHeight * pixelRatio * upscaleFactor;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.scale(pixelRatio * upscaleFactor, pixelRatio * upscaleFactor);
+      ctx.fillStyle = canvasBackgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      return { ctx, canvas };
+    }
+
+    function updateCanvas() {
+      const { ctx, canvas } = initializeCanvas();
+      const palette = getRandomPalette();
+      createRandomDoodle(ctx, canvas, palette);
+    }
+
+    function downloadArt() {
+      const canvas = document.getElementById('canvas');
+      const downloadButton = document.getElementById('downloadArt');
+      const dataUrl = canvas.toDataURL('image/jpeg', 1.0); // Use maximum quality
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = 'random_doodle_art.jpg';
+      link.click();
+    }
+
+    $(document).ready(function() {
+      updateCanvas();
+    });
+  </script>
+</body>
+</html>
